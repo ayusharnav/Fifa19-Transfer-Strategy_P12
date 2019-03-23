@@ -1,61 +1,6 @@
 rm(list = ls(all = T))
-library(readr)
-library(rpart)
-library(data.table)
-library(sqldf)
-library(radarchart)
-library(tidyr)
-library(plyr)
-library(dplyr)
-library(dtplyr)
-library(ggplot2)
-library(modeest)
-library(recommenderlab)
-library(stringr)
-library(DT)
-library(knitr)
-library(grid)
-library(gridExtra)
-library(corrplot)
-library(qgraph)
-library(methods)
-library(Matrix)
-library(ggthemes)
-library(caret)
-library(cluster)
-library(e1071)
-library(mclust)
-library(fpc)
 
-FullData <- as.matrix(read.csv("./data.csv",header=TRUE,encoding = "UTF-8"))
-#FullData[,8]<-gsub("???", '', FullData[,8]) 
-#FullData[,8]<-gsub("K", '000', FullData[,8]) 
-#write.csv(FullData, file="file.csv", row.names = FALSE)
-for(i in seq(1, nrow(FullData))){
-  if(substr(toString(FullData[i,7]), nchar(toString(FullData[i,7])), nchar(toString(FullData[i,7])))=='M'){
-    FullData[i,7]<-gsub("???", '', FullData[i,7]) 
-    FullData[i,7]<-gsub("M", '', FullData[i,7]) 
-    FullData[i,7]<-as.numeric(FullData[i,7])*1000000
-  }
-}
-for(i in seq(1, nrow(FullData))){
-  if(substr(toString(FullData[i,7]), nchar(toString(FullData[i,7])), nchar(toString(FullData[i,7])))=='K'){
-    FullData[i,7]<-gsub("???", '', FullData[i,7]) 
-    FullData[i,7]<-gsub("K", '', FullData[i,7]) 
-    FullData[i,7]<-as.numeric(FullData[i,7])*1000
-  }
-}
-for(i in seq(1, nrow(FullData))){
-  if(substr(toString(FullData[i,7]), nchar(toString(FullData[i,7])), nchar(toString(FullData[i,7])))=='0'){
-    FullData[i,7]<-gsub("???", '', FullData[i,7]) 
-  }
-}
-write.csv(FullData, file="file.csv", row.names = FALSE)
-
-FullData <- as.data.frame(read.csv("./data_new.csv",header=TRUE,encoding = "UTF-8"))
-ggplot(FullData,aes(x=FullData[,4], y=FullData[,7], color=FullData[,2]))+geom_point()+ geom_smooth(method="auto") + xlab("Overall")+ ylab("Value")
-ggsave('G10_plot01.pdf',width=8,height=8)
-
+source('./libraries.R')
 source('./methods.R')
 
 
