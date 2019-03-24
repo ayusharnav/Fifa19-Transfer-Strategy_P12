@@ -9,7 +9,7 @@ source('./methods.R')
 load_train_and_test_data <- function(folder_path='./'){
   # Input: folder_path - points to the folder containing the hw2_training and hw2_test csv files
   # TA has different versions the same file, following the same properties of the data (# row, # columns and class values {1,2,3,4})
-  data <- as.data.frame(read.csv("./data_new.csv",header=TRUE,encoding = "UTF-8"))
+  data <- as.data.frame(read.csv("./data_normalize.csv",header=TRUE,encoding = "UTF-8"))
   smp_size <- floor(0.9996 * nrow(data))
   
   ## set the seed to make your partition reproducible
@@ -60,6 +60,8 @@ dt_result <- calculate_accuracy(dt_classification, y_test)
 # calculate classification outcomes using a tuned Decision Tree
 dt_cv_classification <- dtree_cv(X_train, y_train, X_test, 5)
 dt_cv_result <- calculate_accuracy(dt_cv_classification, y_test)
+
+regression_classification <- regression(4)
 
 setDT(FullData)
 names(FullData)
