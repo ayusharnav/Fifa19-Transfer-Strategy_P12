@@ -240,6 +240,57 @@ dtree_cv <- function(x_train, y_train, x_test, n_folds){
   
 }
 
+regression <- function(k){
+  FullData <- as.data.frame(read.csv("./data_normalize.csv",header=TRUE,encoding = "UTF-8"))
+  var<-sd(FullData[,7])
+  print(var)
+  FullData<-FullData[FullData$Age <=0.25, ] 
+  FullData<-FullData[FullData$Position == "CDM", ] 
+  print(nrow(FullData))
+  smp_size <- floor(0.7 * nrow(FullData))
+  
+  ## set the seed to make your partition reproducible
+  set.seed(123)
+  train_ind <- sample(seq_len(nrow(FullData)), size = smp_size)
+  
+  train.data <- FullData[train_ind, ]
+  test.data <- FullData[-train_ind, ]
+  
+  ggplot(train.data, aes(CalculatedOverall, Value) ) +
+    geom_point() +
+    stat_smooth()
+  
+  # Build the model
+  model <- lm(Value ~ CalculatedOverall, data = train.data)
+  # Make predictions
+  predictions <- model %>% predict(test.data)
+  print (predictions)
+  # Model performance
+  data.frame(
+    RMSE = RMSE(predictions, test.data$Value),
+    R2 = R2(predictions, test.data$Value)
+  )
+  
+  ggplot(train.data, aes(CalculatedOverall, Value) ) +
+    geom_point() +
+    stat_smooth(method = lm, formula = y ~ x)
+  
+  # Build the model
+  model <- lm(Value ~ poly(CalculatedOverall, 5, raw = TRUE), data = train.data)
+  # Make predictions
+  predictions <- model %>% predict(test.data)
+  print (predictions)
+  # Model performance
+  data.frame(
+    RMSE = RMSE(predictions, test.data$Value),
+    R2 = R2(predictions, test.data$Value)
+  )
+  
+  ggplot(train.data, aes(CalculatedOverall, Value) ) +
+    geom_point() +
+    stat_smooth(method = lm, formula = y ~ poly(x, 5, raw = TRUE))
+}
+
 
 calculate_accuracy <- function(y_pred, y_true){
   # Given the following:
@@ -249,10 +300,10 @@ calculate_accuracy <- function(y_pred, y_true){
   # y_true: ground truth class labels (vector, each value of type factor)
   
   # OUTPUT:
-  # a list in the following order: [confusion matrix, overall accuracy], where confusion matrix is of class "table"
+  # a list in the following order: [confusion matrix, CalculatedOverall accuracy], where confusion matrix is of class "table"
   # (see Figure 2 in the PDF for an example Confusion Matrix)
-  # and overall accuracy is on a scale of 0-1 of type double
-  # overall class accuracy = accuracy of all the classes
+  # and CalculatedOverall accuracy is on a scale of 0-1 of type double
+  # CalculatedOverall class accuracy = accuracy of all the classes
   
   # confusion matrix should have Prediction to the left, and Reference on the top.
   print(as.table(setNames(y_pred, y_true)))
