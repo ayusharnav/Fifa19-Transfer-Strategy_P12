@@ -244,8 +244,10 @@ regression <- function(k){
   FullData <- as.data.frame(read.csv("./data_normalize.csv",header=TRUE,encoding = "UTF-8"))
   var<-sd(FullData[,7])
   print(var)
-  FullData<-FullData[FullData$Age <=0.25, ] 
-  FullData<-FullData[FullData$Position == "CDM", ] 
+  FullData<-FullData[FullData$Age <=0.5, ] 
+  FullData<-FullData[FullData$Position == "RW", ] 
+  M<-(cor(FullData[,c(4,14:47)])[,1, drop=FALSE])
+  corrplot(M, method="pie", col=colorRampPalette(c("white","red","green"))(100))
   print(nrow(FullData))
   smp_size <- floor(0.7 * nrow(FullData))
   
@@ -258,7 +260,7 @@ regression <- function(k){
   
   ggplot(train.data, aes(CalculatedOverall, Value) ) +
     geom_point() +
-    stat_smooth()
+    stat_smooth(colour="red")
   
   # Build the model
   model <- lm(Value ~ CalculatedOverall, data = train.data)
@@ -273,7 +275,7 @@ regression <- function(k){
   
   ggplot(train.data, aes(CalculatedOverall, Value) ) +
     geom_point() +
-    stat_smooth(method = lm, formula = y ~ x)
+    stat_smooth(method = lm, formula = y ~ x,colour="red")
   
   # Build the model
   model <- lm(Value ~ poly(CalculatedOverall, 5, raw = TRUE), data = train.data)
@@ -288,7 +290,7 @@ regression <- function(k){
   
   ggplot(train.data, aes(CalculatedOverall, Value) ) +
     geom_point() +
-    stat_smooth(method = lm, formula = y ~ poly(x, 5, raw = TRUE))
+    stat_smooth(method = lm, formula = y ~ poly(x, 5, raw = TRUE),colour="red")
 }
 
 
