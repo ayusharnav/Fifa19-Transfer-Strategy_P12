@@ -1,6 +1,4 @@
-
 rm(list = ls(all = T))
-
 require(caret)
 require(rpart)
 require(ggplot2)
@@ -10,8 +8,6 @@ require(philentropy)
 require(plyr)
 require(utils)
 source('./fifaPositionMethods.R')
-
-
 
 calculate_distance_matrix <- function(train_matrix, test_matrix, method_name){
   distance_matrix = matrix(0L, nrow = nrow(test_matrix), ncol = nrow(train_matrix))
@@ -35,8 +31,6 @@ calculate_euclidean <- function(p, q, poslist) {
   
   return (sqrt(sum((p - q) ^ 2/poslist)))
 }
-
-calculate_cosine <- function(p, q) {
 
 calculate_cosine <- function(p, q) {
   return (sum(p*q)/(sqrt(sum(p ^ 2)) * sqrt(sum(q ^ 2))))
@@ -195,7 +189,6 @@ regression <- function(k){
     geom_point() +
     stat_smooth(method = lm, formula = y ~ poly(x, 5, raw = TRUE),colour="red")
 }
-
 
 calculate_accuracy <- function(y_pred, y_true){
   print(as.table(setNames(y_pred, y_true)))
