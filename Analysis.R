@@ -3,12 +3,7 @@ rm(list = ls(all = T))
 source('./libraries.R')
 source('./methods.R')
 
-
-# function to load and process training and test data 
-# Please note that TA may have a completely different dataset with the same dimensions as the one provided to you
 load_train_and_test_data <- function(folder_path='./'){
-  # Input: folder_path - points to the folder containing the hw2_training and hw2_test csv files
-  # TA has different versions the same file, following the same properties of the data (# row, # columns and class values {1,2,3,4})
   data <- as.data.frame(read.csv("./data_normalize.csv",header=TRUE,encoding = "UTF-8"))
   smp_size <- floor(0.9996 * nrow(data))
   
