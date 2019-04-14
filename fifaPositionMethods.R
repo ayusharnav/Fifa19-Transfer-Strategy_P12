@@ -127,6 +127,72 @@ return_list_for_ST_or_RS_or_LS <- function() {
   return (foo)
 }
 
+getPositions<-function(positions){
+  if(position=="GK"){
+    return (c("GK"))
+  }
+  else if(position=="CB"){
+    return (c("CB","RCB","LCB"))
+  }
+  else if(position=="B"){
+    return (c("LB","RB"))
+  }
+  else if(position=="WB"){
+    return (c("LWB","RWB"))
+  }
+  else if(position=="DM"){
+    return (c("CDM","RDM","LDM"))
+  }
+  else if(position=="AM"){
+    return (c("CAM","RAM","LAM"))
+  }
+  else if(position=="M"){
+    return (c("LM","RM","RCM","RCM","LCM","CM"))
+  }
+  else if(position=="W"){
+    return (c("RW","LW"))
+  }
+  else if(position=="F"){
+    return (c("LF","RF","CF"))
+  }
+  else if(position=="S"){
+    return (c("ST","RS","LS"))
+  }
+}
+
+getPositionClass<-function(position){
+  if(position=="GK"){
+    return (c("GK"))
+  }
+  else if(position=="CB" || position=="RCB" || position=="LCB"){
+    return ("CB")
+  }
+  else if(position=="LB" || position=="RB"){
+    return ("B")
+  }
+  else if(position=="LWB" || position=="RWB"){
+    return ("WB")
+  }
+  else if(position=="CDM" ||position=="RDM" || position=="LDM"){
+    return ("DM")
+  }
+  else if(position=="CAM" || position=="RAM"|| position=="LAM" ){
+    return ("AM")
+  }
+  else if(position=="RM" || position=="LM"  || position=="RCM"  || position=="LCM" || position=="CM" ){
+    return ("M")
+  }
+  else if(position=="RW" || position=="LW" ){
+    return ("W")
+  }
+  else if(position=="LF" || position=="RF" || position=="CF"){
+    return ("F")
+  }
+  else if(position=="ST" || position=="RS" || position=="LS"){
+    return ("S")
+  }
+}
+
 return_list_for_position <- function(position) {
   if(position=="GK"){
     return (return_list_for_GK())

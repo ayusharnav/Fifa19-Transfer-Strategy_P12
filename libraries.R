@@ -1,4 +1,3 @@
-
 if (!require(readr)) install.packages('readr') 
 if (!require(rpart)) install.packages('rpart')
 if (!require(data.table)) install.packages('data.table')
@@ -26,3 +25,4 @@ if (!require(cluster)) install.packages('cluster')
 if (!require(e1071)) install.packages('e1071')
 if (!require(mclust)) install.packages('mclust')
 if (!require(fpc)) install.packages('fpc')
+if (!require(glmnet)) install.packages('glmnet')

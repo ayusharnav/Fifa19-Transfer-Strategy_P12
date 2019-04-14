@@ -2,11 +2,6 @@ rm(list = ls(all = T))
 source('./libraries.R')
 
 normalize_data <- function(data_matrix){
-  # Input: data_matrix: type: matrix n_sentences x sentence_length, 
-  # where n_sentences is total # sentences (155 in the dataset supplied to you) and
-  # sentence_length is the total length of each sentence (200 in the dataset supplied to you).
-  # output: a 155 x 200 matrix of type double, containing the normalized values in [0, 1] range per row.
-  # Write code here to normalize data_matrix
   for(i in seq(1, ncol(data_matrix))){
     temp1<-as.vector(as.numeric(data_matrix[,i]))
     data_matrix[,i] <- (temp1- min(temp1,na.rm=TRUE))/(max(temp1,na.rm=TRUE)-min(temp1,na.rm=TRUE))
