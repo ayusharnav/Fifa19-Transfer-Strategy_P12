@@ -1,4 +1,6 @@
+
 rm(list = ls(all = T))
+
 require(caret)
 require(rpart)
 require(ggplot2)
@@ -10,25 +12,31 @@ require(utils)
 source('./fifaPositionMethods.R')
 
 
+
 calculate_distance_matrix <- function(train_matrix, test_matrix, method_name){
   distance_matrix = matrix(0L, nrow = nrow(test_matrix), ncol = nrow(train_matrix))
   if(method_name %in% c("calculate_euclidean", "calculate_cosine", "calculate_manhattan")){
-
     for(i in seq(1, nrow(test_matrix))){
       print(i)
       for(j in seq(1, nrow(train_matrix))){
-        distance_matrix[i,j] <- do.call(method_name, list(unlist(test_matrix[i,]), unlist(train_matrix[j,])))
+        poslisttest<-return_list_for_position(X_test[i,1])
+        
+        distance_matrix[i,j] <- do.call(method_name, list(unlist(test_matrix[i,c(names(poslisttest))]), unlist(train_matrix[j,c(names(poslisttest))]), unlist(poslisttest)))
       }
     }
   }else if(method_name == "calculate_chebyshev"){
+
     distance_matrix <- calculate_chebyshev(data_matrix)
   }
   return(distance_matrix)
 }
 
-calculate_euclidean <- function(p, q) {
-  return (sqrt(sum((p - q) ^ 2)))
+calculate_euclidean <- function(p, q, poslist) {
+  
+  return (sqrt(sum((p - q) ^ 2/poslist)))
 }
+
+calculate_cosine <- function(p, q) {
 
 calculate_cosine <- function(p, q) {
   return (sum(p*q)/(sqrt(sum(p ^ 2)) * sqrt(sum(q ^ 2))))
@@ -45,6 +53,7 @@ calculate_chebyshev <- function(data_matrix){
 knn_classifier <- function(x_train, y_train, x_test, distance_method, k){
   distance_matrix <- calculate_distance_matrix(x_train,x_test, distance_method)
   result<- vector()
+  
   for(i in seq(1, nrow(distance_matrix))){
     vec <- vector()
     temp<-distance_matrix[i,]
@@ -60,7 +69,6 @@ knn_classifier <- function(x_train, y_train, x_test, distance_method, k){
   print(result)
   return(result)
 }
-
 
 knn_classifier_confidence <- function(x_train, y_train, x_test, distance_method='calculate_cosine', k){
   distance_matrix <- calculate_distance_matrix(x_train,x_test, distance_method)
