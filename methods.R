@@ -15,7 +15,7 @@ calculate_distance_matrix <- function(train_matrix, test_matrix, method_name){
     for(i in seq(1, nrow(test_matrix))){
       print(i)
       for(j in seq(1, nrow(train_matrix))){
-        poslisttest<-return_list_for_position(X_test[i,1])
+        poslisttest<-return_list_for_position(test_matrix[i,'Position'])
         
         distance_matrix[i,j] <- do.call(method_name, list(unlist(test_matrix[i,c(names(poslisttest))]), unlist(train_matrix[j,c(names(poslisttest))]), unlist(poslisttest)))
       }
