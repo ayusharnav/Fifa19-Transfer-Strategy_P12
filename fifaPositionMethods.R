@@ -227,7 +227,7 @@ return_list_for_position <- function(position) {
 }
 
 calculate_overall <- function() {
-  FullData <- as.data.frame(read.csv("./data_new.csv",header=TRUE,encoding = "UTF-8"))
+  FullData <- as.data.frame(read.csv("./data/data_new.csv",header=TRUE,encoding = "UTF-8"))
   overall_vector<-vector()
   for(i in seq(1, nrow(FullData))){
     overall=0
@@ -243,4 +243,28 @@ calculate_overall <- function() {
   
 }
 calculate_overall()
+
+assign_position_class <- function() {
+  FullData <- as.data.frame(read.csv("./data/data_normalize.csv",header=TRUE,encoding = "UTF-8"))
+  class_vector<-vector()
+  for(i in seq(1, nrow(FullData))){
+    if(FullData[i,'Position'] %in% c("CB","LCB","RCB","LB","RB","LWB","RWB")){
+      class_vector<-c(class_vector,"D")
+    }
+    else if(FullData[i,'Position'] %in% c("CDM","LDM","RDM","CAM","RAM","LAM","RM","LM","RCM","LCM","CM")){
+      class_vector<-c(class_vector,"M")
+    }
+    else if(FullData[i,'Position'] %in% c("RW","LW","LF","RF","CF","ST","RS","LS")){
+      class_vector<-c(class_vector,"A")
+    }
+    else if(FullData[i,'Position'] %in% c("GK")){
+      class_vector<-c(class_vector,"GK")
+    }
+  }
+  FullData <- cbind(FullData, class_vector) 
+  colnames(FullData)[ncol(FullData)] <- "SuperPosition"
+  write.csv(FullData, file="superPosition.csv", row.names = FALSE)
+  
+}
+assign_position_class()
 
