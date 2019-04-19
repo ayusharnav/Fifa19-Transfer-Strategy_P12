@@ -11,7 +11,7 @@ source('./fifaPositionMethods.R')
 
 calculate_distance_matrix <- function(train_matrix, test_matrix, method_name){
   distance_matrix = matrix(0L, nrow = nrow(test_matrix), ncol = nrow(train_matrix))
-  if(method_name %in% c("calculate_euclidean", "calculate_cosine", "calculate_manhattan")){
+  if(method_name %in% c("calculate_euclidean")){
     for(i in seq(1, nrow(test_matrix))){
       print(i)
       for(j in seq(1, nrow(train_matrix))){
@@ -20,9 +20,6 @@ calculate_distance_matrix <- function(train_matrix, test_matrix, method_name){
         distance_matrix[i,j] <- do.call(method_name, list(unlist(test_matrix[i,c(names(poslisttest))]), unlist(train_matrix[j,c(names(poslisttest))]), unlist(poslisttest)))
       }
     }
-  }else if(method_name == "calculate_chebyshev"){
-
-    distance_matrix <- calculate_chebyshev(data_matrix)
   }
   return(distance_matrix)
 }
@@ -32,18 +29,6 @@ calculate_euclidean <- function(p, q, poslist) {
   return (sqrt(sum((p - q) ^ 2/poslist)))
 }
 
-calculate_cosine <- function(p, q) {
-  return (sum(p*q)/(sqrt(sum(p ^ 2)) * sqrt(sum(q ^ 2))))
-}
-
-calculate_manhattan <- function(p, q) {
-  return (sum(abs(p-q)))
-}
-
-calculate_chebyshev <- function(data_matrix){
-  return (distance(data_matrix, method = "chebyshev"))
-}
-
 knn_classifier <- function(x_train, y_train, x_test, distance_method, k){
   distance_matrix <- calculate_distance_matrix(x_train,x_test, distance_method)
   result<- vector()
@@ -51,11 +36,8 @@ knn_classifier <- function(x_train, y_train, x_test, distance_method, k){
   for(i in seq(1, nrow(distance_matrix))){
     vec <- vector()
     temp<-distance_matrix[i,]
-    if(distance_method %in% c("calculate_euclidean", "calculate_chebyshev", "calculate_manhattan")){
+    if(distance_method %in% c("calculate_euclidean")){
       vec<-(sort(temp, index.return=TRUE)$ix)[1:k]
-    }
-    else if(distance_method=='calculate_cosine'){
-      vec<-(sort(temp, index.return=TRUE,decreasing=TRUE)$ix)[1:k]
     }
     vec<-y_train[vec]
     result[i]<-mean(vec)
@@ -85,36 +67,6 @@ knn_classifier_confidence <- function(x_train, y_train, x_test, distance_method=
   
 }
 
-dtree <- function(x_train, y_train, x_test){
-  set.seed(123)
-  x_train[,ncol(x_train)+1]<-y_train
-  colnames(x_train)[ncol(x_train)] <- "Class"
-  tree <- rpart(Class~.,
-                data=x_train,
-                method = "class",
-                parms=list(split='gini'))
-  plot(tree)
-  text(tree)
-  return(rpart_predict <- predict(tree,x_test,type="class"))
-  
-}
-
-
-dtree_cv <- function(x_train, y_train, x_test, n_folds){
-  set.seed(123)
-  x_train[,ncol(x_train)+1]<-y_train
-  colnames(x_train)[ncol(x_train)] <- "Class"
-  
-  train_control<- trainControl(method="cv", number=n_folds, savePredictions = TRUE)
-  
-  model<- train(Class~., data=x_train, trControl=train_control, method="rpart")
-  
-  cv_predict<- predict(model,x_test)
-  
-  return(cv_predict)
-  
-}
-
 getAgeBracket<-function(normalized_age){
   if(normalized_age<= 0.25){
     return(0.25)
@@ -131,7 +83,7 @@ getAgeBracket<-function(normalized_age){
 }
 
 regression <- function(k){
-  FullData <- as.data.frame(read.csv("./data_normalize.csv",header=TRUE,encoding = "UTF-8"))
+  FullData <- as.data.frame(read.csv("./data/data_normalize.csv",header=TRUE,encoding = "UTF-8"))
   #M<-(cor(FullData[,c(4,14:47)])[,1, drop=FALSE])
   #corrplot(M, method="number")
   #print(nrow(FullData))

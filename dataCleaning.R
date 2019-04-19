@@ -9,7 +9,7 @@ normalize_data <- function(data_matrix){
   return(data_matrix)
 }
 
-FullData <- as.matrix(read.csv("./data_new.csv",header=TRUE,encoding = "UTF-8"))
+FullData <- as.matrix(read.csv("./data/data_new.csv",header=TRUE,encoding = "UTF-8"))
 #FullData[,8]<-gsub("???", '', FullData[,8]) 
 #FullData[,8]<-gsub("K", '000', FullData[,8]) 
 #write.csv(FullData, file="file.csv", row.names = FALSE)

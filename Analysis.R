@@ -4,7 +4,7 @@ source('./libraries.R')
 source('./methods.R')
 
 load_train_and_test_data <- function(folder_path='./'){
-  data <- as.data.frame(read.csv("./data_normalize.csv",header=TRUE,encoding = "UTF-8"))
+  data <- as.data.frame(read.csv("./data/data_normalize.csv",header=TRUE,encoding = "UTF-8"))
   smp_size <- floor(0.9996 * nrow(data))
   
   ## set the seed to make your partition reproducible
@@ -57,37 +57,3 @@ dt_cv_classification <- dtree_cv(X_train, y_train, X_test, 5)
 dt_cv_result <- calculate_accuracy(dt_cv_classification, y_test)
 
 regression_classification <- regression(4)
-
-setDT(FullData)
-names(FullData)
-
-# Age of footballers
-ggplot(FullData, aes(Age, fill = Age)) +
-geom_density(position = "stack") 
-
-# Player's Overall Distribution
-FullData %>% 
-ggplot(aes(x = Overall, fill = factor(Overall))) +
-  geom_bar(color = "grey20") + guides(fill = FALSE)+
-  labs(title="Player's Overall ")
-
-#Rating vs Age
-agerating <- FullData[Age<100,.("Overall"=mean(Overall)),by=Age][order(-Age)]
-ggplot(data = agerating,aes(x=Age,y=Overall))+
-  geom_line(color="red",size=2)+labs(title="Rating vs Age")+
-  annotate("text", x = 30, y = max(agerating$overall),color="blue", label = "Max", parse = TRUE, size = 3)
-
-# Best Clubs
-TeamDF<-arrange(FullData[, list(Avg=mean(Overall)), by= "Club" ], desc(Avg) )
-kable(head(TeamDF, 10))
-
-#Number of clusters
-cluster = FullData[,c(4,9,16:18,27:88)]
-cluster[is.na(cluster)] = 0
-wss <- (nrow(cluster[,c()])-1)*sum(apply(cluster[,1:ncol(cluster)],2,var))
-print(wss)
-for (i in 2:10) 
-  wss[i] <- sum(kmeans(cluster[,1:ncol(cluster)], centers=i)$withinss)
-
-plot(1:
-       10, wss, type="b", xlab="Number of Cluster",  ylab="Squares Summatory")
