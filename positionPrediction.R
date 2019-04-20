@@ -2,13 +2,14 @@ rm(list=ls(all=T))
 cat('\014')
 
 source('./libraries.R')
+source('./gaussianClustering.R')
 
 # set your working directory
 # setwd()
 
 set.seed(100)
 ############################################################################################################
-load_data <- function(data_folder='./data/', learning_type){
+load_data <- function(learning_type){
   FullData <- read.csv(paste0('./data/data_normalize.csv'), header=T)
   
   smp_size <- floor(0.7 * nrow(FullData))
@@ -29,55 +30,81 @@ load_data <- function(data_folder='./data/', learning_type){
 ##########################################################################################################
 # Load data
 # load data necessary for classification
-clf_data <- load_data(data_folder='./data/', learning_type='classification')
+clustering_data <- read.csv(paste0('./data/data_normalize.csv'), header=T)
+clf_data <- load_data(learning_type='classification')
 clf_train_df <- clf_data[[1]]
 clf_test_df <- clf_data[[2]]
 
+clustering_data %>% 
+  ggpairs(columns = c(40:45,49),aes(col=SuperPosition))
+
+fifa_pca <- clustering_data[14:47] %>% 
+  prcomp(center=TRUE,scale.=TRUE)
+
+print(fifa_pca)
+
+tibble(sd = fifa_pca$sdev, 
+       pc = 1:length(sd)) %>% 
+  mutate(cumvar = cumsum((sd^2)/sum(sd^2))) %>% 
+  ggplot(aes(pc,cumvar))+geom_line()+geom_point()+
+  labs(x="Principal Component",y="Cummulative Proportion of Variance Explained")+
+  theme_ipsum_rc()
+
+ggbiplot(fifa_pca, obs.scale = 1, var.scale = 1, alpha = 0.01,
+         groups = clustering_data$SuperPosition, varname.size = 4, varname.adjust = 3,
+         ellipse = TRUE, circle = FALSE) +
+  scale_color_discrete(name = '') +
+  scale_x_continuous(limits = c(-20,20))+
+  scale_y_continuous(limits = c(-10,10))+
+  theme_ipsum_rc()+
+  theme(legend.direction = 'horizontal', legend.position = 'bottom')
+
+
 # KNN for positions
-train_control <- trainControl(method = "repeatedcv", number = 10, repeats = 3)
-grid_knn <- expand.grid(.k=seq(40,100,5))
-fifa_knn <- train(clf_train_df[,c(14:47)], clf_train_df[,50], method = "knn",
-                  trControl = train_control,preProcess = c("center","scale"),
+train_control <- trainControl(method = "repeatedcv", number = 10, repeats = 3, preProcOptions = list(pcaComp = 15))
+grid_knn <- expand.grid(.k=seq(45,45,0))
+position_knn <- train(clf_train_df[,c(14:47)], clf_train_df[,50], method = "knn",
+                  trControl = train_control,preProcess = c("center","scale","pca"),
                   tuneGrid = grid_knn)
 
-fifa_knn
+position_knn
 
-fifa_knn_predict <- predict(fifa_knn,newdata = clf_test_df[,c(14:47)])
-confusionMatrix(fifa_knn_predict,clf_test_df[,50])
+position_knn_predict <- predict(position_knn,newdata = clf_test_df[,c(14:47)])
+confusionMatrix(position_knn_predict,clf_test_df[,50])
 
 
 # Random Forest for positions
 train_control <- trainControl(method = "repeatedcv",number = 10, repeats = 3)
 grid_rf <- expand.grid(.mtry=c(5))
-fifa_rf <- train(clf_train_df[,c(14:47)], clf_train_df[,50], method = "rf",
+position_rf <- train(clf_train_df[,c(14:47)], clf_train_df[,50], method = "rf",
                  trControl = train_control,preProcess = c("center","scale"),
                  tuneGrid = grid_rf)
 
-fifa_rf
+position_rf
 
-fifa_rf_predict <- predict(fifa_rf,newdata =  clf_test_df[,c(14:47)])
-confusionMatrix(fifa_rf_predict,clf_test_df[,50])
+position_rf_predict <- predict(position_rf,newdata =  clf_test_df[,c(14:47)])
+confusionMatrix(position_rf_predict,clf_test_df[,50])
 
 #SVM Linear for Positions
 train_control <- trainControl(method = "repeatedcv", number = 10, repeats = 3)
 grid_svm <- expand.grid(.cost=c(0.75, 0.9, 1, 1.1, 1.25,2))
-fifa_svm_linear <- train(clf_train_df[,c(14:47)], clf_train_df[,50], method = "svmLinear2",
+position_svm_linear <- train(clf_train_df[,c(14:47)], clf_train_df[,50], method = "svmLinear2",
                          trControl=train_control,
                          preProcess = c("center", "scale"),
                          tuneGrid = grid_svm)
-plot(fifa_svm_linear) 
-fifa_svm_linear_predict <- predict(fifa_svm_linear,newdata = clf_test_df[,c(14:47)])
-confusionMatrix(fifa_svm_linear_predict,clf_test_df[,50])
+plot(position_svm_linear) 
+position_svm_linear_predict <- predict(position_svm_linear,newdata = clf_test_df[,c(14:47)])
+confusionMatrix(position_svm_linear_predict,clf_test_df[,50])
 
 #Neural Net for Positions
 train_control <- trainControl(method = "repeatedcv",number = 10, repeats = 3)
 grid_nnet <- expand.grid(.decay=c(0.5),.size=c(5))
-fifa_nnet <- train(clf_train_df[,c(14:47)], clf_train_df[,50], method = "nnet",
+position_nnet <- train(clf_train_df[,c(14:47)], clf_train_df[,50], method = "nnet",
                    trControl = train_control, preProcess = c("center","scale"),
                    tuneGrid = grid_nnet, maxit = 500, abstol=1e-2)
-fifa_nnet
-fifa_nnet_predict <- predict(fifa_nnet,newdata = clf_test_df[,c(14:47)])
-confusionMatrix(fifa_nnet_predict,clf_test_df[,50])
+position_nnet
+position_nnet_predict <- predict(position_nnet,newdata = clf_test_df[,c(14:47)])
+confusionMatrix(position_nnet_predict,clf_test_df[,50])
 
 comparePosition <- function(x,y){
   if(x==y){
@@ -122,6 +149,8 @@ comparePosition <- function(x,y){
   }
   return(FALSE)
 }
+
+
 calculate_overall_accuracy <- function() {
   FullData <- as.data.frame(read.csv("./data/data_new.csv",header=TRUE,encoding = "UTF-8"))
   FullData = FullData[FullData$Position=="LB" | FullData$Position=="RB",]
@@ -180,3 +209,21 @@ calculate_overall_accuracy <- function() {
 }
 
 calculate_overall_accuracy()
+
+
+kmeans_result <- player_cluster(data_df = clustering_data[,c(14:47)], n_clusters = 10, clustering_type = "kmeans")
+kmeans_sse <- calculate_sse(data_df = clustering_data[,c(14:47)], cluster_assignments = kmeans_result)
+
+# Single link
+single_link_result <- player_cluster(data_df = clustering_data[,c(14:47)], n_clusters = 7, clustering_type = "single-link")
+single_link_sse <- calculate_sse(data_df = clustering_data[,c(14:47)], cluster_assignments = single_link_result)
+
+# complete link
+complete_link_result <- player_cluster(data_df = clustering_data[,c(14:47)], n_clusters = 7, clustering_type = "complete-link")
+complete_link_sse <- calculate_sse(data_df = clustering_data[,c(14:47)], cluster_assignments = complete_link_result)
+
+kmeans_elbow_plot(data_df = clustering_data[,c(14:47)], k_values = c(1:15))
+
+print(paste("Kmeans SSE for given params = ", kmeans_sse))
+print(paste("Single link SSE for given params = ", single_link_sse))
+print(paste("Complete link SSE for given params = ", complete_link_sse))
