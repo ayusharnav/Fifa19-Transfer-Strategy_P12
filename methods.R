@@ -13,7 +13,7 @@ calculate_distance_matrix <- function(train_matrix, test_matrix, method_name){
   distance_matrix = matrix(0L, nrow = nrow(test_matrix), ncol = nrow(train_matrix))
   if(method_name %in% c("calculate_euclidean")){
     for(i in seq(1, nrow(test_matrix))){
-      print(i)
+      #print(i)
       for(j in seq(1, nrow(train_matrix))){
         poslisttest<-return_list_for_position(test_matrix[i,'Position'])
         
