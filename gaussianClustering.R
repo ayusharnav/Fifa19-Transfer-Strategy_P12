@@ -8,7 +8,7 @@ source('./methods.R')
 finalGaussianclustering <- function() {
   FullData <-
     as.data.frame(read.csv(
-      "./data/data_normalize.csv",
+      "./data_normalize.csv",
       header = TRUE,
       encoding = "UTF-8"
     ))
@@ -16,19 +16,16 @@ finalGaussianclustering <- function() {
   train_ind <- sample(seq_len(nrow(FullData)), size = smp_size)
   train.data <- FullData[train_ind,]
   test.data <- FullData[-train_ind,]
-  # write for loop here !!!
-  #testvalue <- test.data[z,] ## change it !
   
-  ####
-  
-  #train.data <- train.data[train.data$Position==testvalue$Position & train.data$Club!=testvalue$Club,]
   mb = Mclust(train.data[, c(49, 7)])
   result <- mb$classification
   counter <- 0
-  for (z in seq(1:nrow(test.data))) {
+  predictedPlayer <- c()
+  g <- 1
+  test.data <- test.data[20:70,]
+  for (z in seq(1:50)) {
     testvalue <- test.data[z, ]
     predTest <- predict(mb, testvalue[, c(49, 7)])
-    
     temp <- c()
     k <- 1
     for (i in seq(length(result))) {
@@ -38,10 +35,12 @@ finalGaussianclustering <- function() {
       }
     }
     
-    distance_matrix <-calculate_distance_matrix(FullData[temp, ], testvalue, 'calculate_euclidean')
-    playerKdistances <-sort(distance_matrix,index.return = TRUE,decreasing = FALSE)$ix[1:8]
-    #print(FullData[temp[playerKdistances],])
-    #print("#########")
+    distance_matrix <-
+      calculate_distance_matrix(FullData[temp, ], testvalue, 'calculate_euclidean')
+    playerKdistances <-
+      sort(distance_matrix,
+           index.return = TRUE,
+           decreasing = FALSE)$ix[1:8]
     #print(testvalue)
     clubmembers <- train.data[train.data$Club == testvalue$Club, ]
     ########################################## contribution to the team
@@ -61,6 +60,11 @@ finalGaussianclustering <- function() {
     }
     sr1 = (sum1 + cf1) / (nrow(clubmembers) + 1)
     
+    indices = 0
+    l1 = c()
+    l2 = c()
+    l3 = c()
+    l4 = c()
     for (i in seq(1:length(temp[playerKdistances]))) {
       if (FullData[temp[playerKdistances][i], 'Club'] != testvalue$Club) {
         sum2 <-
@@ -79,14 +83,54 @@ finalGaussianclustering <- function() {
         }
         
         sr2 = (sum2 + cf2) / (nrow(clubmembers) + 1)
+        #if(minvalue>=FullData[temp[playerKdistances][i],'Value']){
+        #minvalue = FullData[temp[playerKdistances][i],'Value']
+        #indices <- temp[playerKdistances][i]
+        #}
         
-        if (sr2 >= sr1) {
-          
-          counter <- counter + 1
-          #print(FullData[temp[playerKdistances][i],]) # uncomment this to see the predicted player data
+        if(testvalue$Value > FullData[temp[playerKdistances][i],'Value'] & 
+           testvalue$CalculatedOverall < FullData[temp[playerKdistances][i],'CalculatedOverall']){ # to see in the graph about stats
+          #pastsr2 = sr2
+          l1 <- c(l1,temp[playerKdistances][i])
+          #minvalue = FullData[temp[playerKdistances][i],'Value']
+        } else if (testvalue$Value < FullData[temp[playerKdistances][i],'Value'] & 
+                   testvalue$CalculatedOverall < FullData[temp[playerKdistances][i],'CalculatedOverall']) {
+          l2 <- c(l2,temp[playerKdistances][i])
+        } else if (testvalue$Value > FullData[temp[playerKdistances][i],'Value'] & 
+                   testvalue$CalculatedOverall > FullData[temp[playerKdistances][i],'CalculatedOverall']) {
+          l3 <- c(l3,temp[playerKdistances][i])
+        } else {
+          l4 <- c(l4,temp[playerKdistances][i])
         }
+        #if (sr2 >= sr1) { # For accuracy computation
+        #print(sr2)
+        #print(sr1)
+        #  counter <- counter + 1
+        #break
+        #print(FullData[temp[playerKdistances][i],])
+        #}
       }
     }
+    if(length(l1)>0) {
+      predictedPlayer[g] <- l1[1]
+    } else if(length(l2)>0){
+      predictedPlayer[g] <- l2[1]
+    } else if(length(l3)>0){
+      predictedPlayer[g] <- l3[1]
+    } else {
+      predictedPlayer[g] <- l4[1]
+    }
+    
+    g <- g+1
+  }
+  
+  
+  plot(test.data[1:50,'CalculatedOverall'],test.data[1:50,'Value'],col="red",xlim = c(0.8,0.95),ylim = c(0,0.45))
+  
+  points(FullData[predictedPlayer,'CalculatedOverall'],FullData[predictedPlayer,'Value'],col="blue")
+  
+  for( i in seq(1:length(predictedPlayer))){
+    arrows(test.data[i,'CalculatedOverall'],test.data[i,'Value'], FullData[predictedPlayer,'CalculatedOverall'][i],FullData[predictedPlayer,'Value'][i])
   }
   print("accuracy")
   print(counter / nrow(test.data))
