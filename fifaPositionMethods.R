@@ -242,7 +242,6 @@ calculate_overall <- function() {
   write.csv(FullData, file="calc_overall.csv", row.names = FALSE)
   
 }
-calculate_overall()
 
 assign_position_class <- function() {
   FullData <- as.data.frame(read.csv("./data/data_normalize.csv",header=TRUE,encoding = "UTF-8"))
@@ -266,5 +265,4 @@ assign_position_class <- function() {
   write.csv(FullData, file="superPosition.csv", row.names = FALSE)
   
 }
-assign_position_class()
 
