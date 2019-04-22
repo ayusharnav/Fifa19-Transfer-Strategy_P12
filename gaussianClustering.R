@@ -8,7 +8,7 @@ source('./methods.R')
 finalGaussianclustering <- function() {
   FullData <-
     as.data.frame(read.csv(
-      "./data_normalize.csv",
+      "./data/data_normalize.csv",
       header = TRUE,
       encoding = "UTF-8"
     ))
@@ -130,7 +130,19 @@ finalGaussianclustering <- function() {
   points(FullData[predictedPlayer,'CalculatedOverall'],FullData[predictedPlayer,'Value'],col="blue")
   
   for( i in seq(1:length(predictedPlayer))){
-    arrows(test.data[i,'CalculatedOverall'],test.data[i,'Value'], FullData[predictedPlayer,'CalculatedOverall'][i],FullData[predictedPlayer,'Value'][i])
+    if(test.data[i,'CalculatedOverall'] - FullData[predictedPlayer,'CalculatedOverall'][i]<=0 && test.data[i,'Value'] - FullData[predictedPlayer,'Value'][i] >=0){
+      color<-'green'
+    }
+    else if(test.data[i,'CalculatedOverall'] - FullData[predictedPlayer,'CalculatedOverall'][i]<=0 && test.data[i,'Value'] - FullData[predictedPlayer,'Value'][i] < 0){
+      color<-'blue'
+    } 
+    else if(test.data[i,'CalculatedOverall'] - FullData[predictedPlayer,'CalculatedOverall'][i] > 0 && test.data[i,'Value'] - FullData[predictedPlayer,'Value'][i] >= 0){
+      color<-'yellow'
+    }
+    else{
+      color<-'red'
+    }
+    arrows(test.data[i,'CalculatedOverall'],test.data[i,'Value'], FullData[predictedPlayer,'CalculatedOverall'][i],FullData[predictedPlayer,'Value'][i],col=color)
   }
   print("accuracy")
   print(counter / nrow(test.data))
