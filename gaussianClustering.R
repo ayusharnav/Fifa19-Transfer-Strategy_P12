@@ -19,11 +19,16 @@ finalGaussianclustering <- function() {
   
   mb = Mclust(train.data[, c(49, 7)])
   result <- mb$classification
-  counter <- 0
   predictedPlayer <- c()
   g <- 1
-  test.data <- test.data[20:70,]
-  for (z in seq(1:50)) {
+  counter <- 0
+  print(nrow(test.data))
+  l1count <- 0
+  l2count <- 0
+  l3count <- 0
+  l4count <- 0
+  #test.data <- test.data[20:70,]
+  for (z in seq(1:nrow(test.data))) {
     testvalue <- test.data[z, ]
     predTest <- predict(mb, testvalue[, c(49, 7)])
     temp <- c()
@@ -112,38 +117,78 @@ finalGaussianclustering <- function() {
       }
     }
     if(length(l1)>0) {
-      predictedPlayer[g] <- l1[1]
+      minValue = 100
+      player = l1[1]
+      for (i in seq(1:length(l1))) {
+        if(abs(testvalue['Value'] - FullData[l1[i],'Value']) < minValue) {
+          minValue = abs(testvalue['Value'] - FullData[l1[i],'Value'])
+          player <- l1[i]
+        }
+      }
+      predictedPlayer[g] <- player
+      counter <- counter + 1
+      l1count <- l1count + 1
     } else if(length(l2)>0){
-      predictedPlayer[g] <- l2[1]
+      minValue = 100
+      player = l2[1]
+      for (i in seq(1:length(l2))) {
+        if(abs(testvalue['Value'] - FullData[l2[i],'Value']) < minValue) {
+          minValue = abs(testvalue['Value'] - FullData[l2[i],'Value'])
+          player <- l2[i]
+        }
+      }
+      predictedPlayer[g] <- player
+      counter <- counter + 0.5
+      l2count <- l2count + 1
     } else if(length(l3)>0){
-      predictedPlayer[g] <- l3[1]
+      minValue = 100
+      player = l3[1]
+      for (i in seq(1:length(l3))) {
+        if(abs(testvalue['Value'] - FullData[l3[i],'Value']) < minValue) {
+          minValue = abs(testvalue['Value'] - FullData[l3[i],'Value'])
+          player <- l3[i]
+        }
+      }
+      predictedPlayer[g] <- player
+      counter <- counter + 0.0 
+      l3count <- l3count + 1
     } else {
-      predictedPlayer[g] <- l4[1]
+      minValue = 100
+      player = l4[1]
+      for (i in seq(1:length(l4))) {
+        if(abs(testvalue['Value'] - FullData[l4[i],'Value']) < minValue) {
+          minValue = abs(testvalue['Value'] - FullData[l4[i],'Value'])
+          player <- l4[i]
+        }
+      }
+      predictedPlayer[g] <- player
+      counter <- counter + 0.0
+      l4count <- l4count + 1
     }
     
     g <- g+1
   }
   
+  # uncomment below lines to see the plot
+  # plot(test.data[1:50,'CalculatedOverall'],test.data[1:50,'Value'],col="red",xlim = c(0.70,0.95),ylim = c(0,0.45))
+  # points(FullData[predictedPlayer,'CalculatedOverall'],FullData[predictedPlayer,'Value'],col="blue")
   
-  plot(test.data[1:50,'CalculatedOverall'],test.data[1:50,'Value'],col="red",xlim = c(0.8,0.95),ylim = c(0,0.45))
+  # for( i in seq(1:length(predictedPlayer))){
+  #   if(test.data[i,'CalculatedOverall'] - FullData[predictedPlayer,'CalculatedOverall'][i]<=0 && test.data[i,'Value'] - FullData[predictedPlayer,'Value'][i] >=0){
+  #     color<-'green'
+  #   }
+  #   else if(test.data[i,'CalculatedOverall'] - FullData[predictedPlayer,'CalculatedOverall'][i]<=0 && test.data[i,'Value'] - FullData[predictedPlayer,'Value'][i] < 0){
+  #     color<-'blue'
+  #   } 
+  #   else if(test.data[i,'CalculatedOverall'] - FullData[predictedPlayer,'CalculatedOverall'][i] > 0 && test.data[i,'Value'] - FullData[predictedPlayer,'Value'][i] >= 0){
+  #     color<-'yellow'
+  #   }
+  #   else{
+  #     color<-'red'
+  #   }
+  #   arrows(test.data[i,'CalculatedOverall'],test.data[i,'Value'], FullData[predictedPlayer,'CalculatedOverall'][i],FullData[predictedPlayer,'Value'][i],col=color)
+  # }
   
-  points(FullData[predictedPlayer,'CalculatedOverall'],FullData[predictedPlayer,'Value'],col="blue")
-  
-  for( i in seq(1:length(predictedPlayer))){
-    if(test.data[i,'CalculatedOverall'] - FullData[predictedPlayer,'CalculatedOverall'][i]<=0 && test.data[i,'Value'] - FullData[predictedPlayer,'Value'][i] >=0){
-      color<-'green'
-    }
-    else if(test.data[i,'CalculatedOverall'] - FullData[predictedPlayer,'CalculatedOverall'][i]<=0 && test.data[i,'Value'] - FullData[predictedPlayer,'Value'][i] < 0){
-      color<-'blue'
-    } 
-    else if(test.data[i,'CalculatedOverall'] - FullData[predictedPlayer,'CalculatedOverall'][i] > 0 && test.data[i,'Value'] - FullData[predictedPlayer,'Value'][i] >= 0){
-      color<-'yellow'
-    }
-    else{
-      color<-'red'
-    }
-    arrows(test.data[i,'CalculatedOverall'],test.data[i,'Value'], FullData[predictedPlayer,'CalculatedOverall'][i],FullData[predictedPlayer,'Value'][i],col=color)
-  }
   print("accuracy")
   print(counter / nrow(test.data))
 }
