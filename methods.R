@@ -84,9 +84,6 @@ getAgeBracket<-function(normalized_age){
 
 regression <- function(k){
   FullData <- as.data.frame(read.csv("./data/data_normalize.csv",header=TRUE,encoding = "UTF-8"))
-  #M<-(cor(FullData[,c(4,14:47)])[,1, drop=FALSE])
-  #corrplot(M, method="number")
-  #print(nrow(FullData))
   smp_size <- floor(0.8 * nrow(FullData))
   
   ## set the seed to make your partition reproducible
@@ -96,20 +93,6 @@ regression <- function(k){
   train.data <- FullData[train_ind, ]
   test.data <- FullData[-train_ind, ]
   
-  # Build the model
-  #model <- lm(Value ~ CalculatedOverall, data = train.data)
-  # Make predictions
-  #predictions <- model %>% predict(test.data)
-  #print (predictions)
-  # Model performance
-  #data.frame(
-  #  RMSE = RMSE(predictions, test.data$Value),
-  #  R2 = R2(predictions, test.data$Value)
-  #)
-  
-  #ggplot(train.data, aes(CalculatedOverall, Value) ) +
-  #  geom_point() +
-  #  stat_smooth(method = lm, formula = y ~ x,colour="red")
   modelDict <- vector(mode="list", length=40)
   count<-0
   v<- vector()

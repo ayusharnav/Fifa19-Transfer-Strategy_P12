@@ -87,14 +87,14 @@ confusionMatrix(position_rf_predict,clf_test_df[,50])
 
 #SVM Linear for Positions
 train_control <- trainControl(method = "repeatedcv", number = 10, repeats = 3)
-grid_svm <- expand.grid(.cost=c(0.75, 0.9, 1, 1.1, 1.25,2))
-position_svm_linear <- train(clf_train_df[,c(14:47)], clf_train_df[,50], method = "svmLinear2",
+grid_svm <- expand.grid(.cost=c(1.75))
+position_svm_linear <- train(clf_train_df[,c(14:47)], clf_train_df[,13], method = "svmLinear2",
                          trControl=train_control,
                          preProcess = c("center", "scale"),
                          tuneGrid = grid_svm)
 plot(position_svm_linear) 
 position_svm_linear_predict <- predict(position_svm_linear,newdata = clf_test_df[,c(14:47)])
-confusionMatrix(position_svm_linear_predict,clf_test_df[,50])
+confusionMatrix(position_svm_linear_predict,clf_test_df[,13])
 
 #Neural Net for Positions
 train_control <- trainControl(method = "repeatedcv",number = 10, repeats = 3)
